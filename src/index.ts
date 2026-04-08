@@ -2,25 +2,17 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
-const API_KEY = process.env.EQUALSEAT_API_KEY;
-const BASE_URL = process.env.EQUALSEAT_API_URL ?? 'https://equalseat.ai';
-
-if (!API_KEY) {
-  console.error(
-    'EQUALSEAT_API_KEY is required. Set it in your environment or Claude Code MCP config.',
-  );
-  process.exit(1);
-}
-
 async function apiRequest(
+  baseUrl: string,
+  apiKey: string,
   path: string,
   body: Record<string, unknown>,
 ): Promise<unknown> {
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await fetch(`${baseUrl}${path}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(body),
   });
@@ -34,16 +26,24 @@ async function apiRequest(
 }
 
 async function main() {
+  const apiKey = process.env.EQUALSEAT_API_KEY;
+  const baseUrl = process.env.EQUALSEAT_API_URL ?? 'https://equalseat.ai';
+
+  if (!apiKey) {
+    console.error(
+      'EQUALSEAT_API_KEY is required. Set it in your environment or Claude Code MCP config.',
+    );
+    process.exit(1);
+  }
+
   const server = new McpServer({
     name: 'equalseat',
     version: '0.1.0',
   });
 
-  // Tool: ask
-  // Ask the knowledge base a question and get an answer with sources.
   server.tool(
     'ask',
-    'Ask the equalseat.ai knowledge base a question. Returns an answer synthesised from the organisation\'s knowledge with cited sources.',
+    "Ask the equalseat.ai knowledge base a question. Returns an answer synthesised from the organisation's knowledge with cited sources.",
     {
       question: z
         .string()
@@ -51,7 +51,9 @@ async function main() {
     },
     async ({ question }) => {
       try {
-        const result = (await apiRequest('/api/kb/ask', { question })) as {
+        const result = (await apiRequest(baseUrl, apiKey, '/api/kb/ask', {
+          question,
+        })) as {
           answer: string;
           sources: Array<{
             item_id: string;
@@ -87,8 +89,6 @@ async function main() {
     },
   );
 
-  // Tool: ingest
-  // Add content to the knowledge base for extraction.
   server.tool(
     'ingest',
     'Add content to the equalseat.ai knowledge base. The content will be processed through the extraction pipeline to identify facts, decisions, processes, and questions.',
@@ -106,7 +106,7 @@ async function main() {
     },
     async ({ sourceName, sourceType, text }) => {
       try {
-        const result = (await apiRequest('/api/kb/ingest', {
+        const result = (await apiRequest(baseUrl, apiKey, '/api/kb/ingest', {
           sourceName,
           sourceType,
           rawText: text,

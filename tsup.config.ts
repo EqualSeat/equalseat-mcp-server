@@ -4,7 +4,7 @@ export default defineConfig((options) => ({
   ...options,
   entry: ['src/index.ts'],
   format: ['cjs'],
-  target: 'es2024',
+  target: 'node18',
   outDir: 'build',
   clean: true,
   sourcemap: true,
