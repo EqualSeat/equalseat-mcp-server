@@ -3,19 +3,29 @@
   "version": "0.1.0",
   "description": "MCP server for the equalseat.ai knowledge base platform",
   "bin": {
-    "equalseat-mcp": "./build/index.cjs"
+    "equalseat-mcp": "./build/cli.cjs"
   },
   "type": "module",
-  "main": "./build/index.cjs",
-  "files": ["build"],
+  "main": "./build/cli.cjs",
+  "files": [
+    "build"
+  ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
     "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "tsup"
   },
-  "keywords": ["mcp", "equalseat", "knowledge-base", "claude"],
+  "keywords": [
+    "mcp",
+    "equalseat",
+    "knowledge-base",
+    "claude"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -28,6 +38,7 @@
   "devDependencies": {
     "@types/node": "^22.15.3",
     "tsup": "^8.5.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.3"
   }
 }
