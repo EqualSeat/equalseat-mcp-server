@@ -2,7 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
-async function apiRequest(
+export async function apiRequest(
   baseUrl: string,
   apiKey: string,
   path: string,
@@ -25,17 +25,7 @@ async function apiRequest(
   return response.json();
 }
 
-async function main() {
-  const apiKey = process.env.EQUALSEAT_API_KEY;
-  const baseUrl = process.env.EQUALSEAT_API_URL ?? 'https://equalseat.ai';
-
-  if (!apiKey) {
-    console.error(
-      'EQUALSEAT_API_KEY is required. Set it in your environment or Claude Code MCP config.',
-    );
-    process.exit(1);
-  }
-
+export function createServer(apiKey: string, baseUrl: string): McpServer {
   const server = new McpServer({
     name: 'equalseat',
     version: '0.1.0',
@@ -137,11 +127,28 @@ async function main() {
     },
   );
 
+  return server;
+}
+
+async function main() {
+  const apiKey = process.env.EQUALSEAT_API_KEY;
+  const baseUrl = process.env.EQUALSEAT_API_URL ?? 'https://equalseat.ai';
+
+  if (!apiKey) {
+    console.error(
+      'EQUALSEAT_API_KEY is required. Set it in your environment or Claude Code MCP config.',
+    );
+    process.exit(1);
+  }
+
+  const server = createServer(apiKey, baseUrl);
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
 
-main().catch((error) => {
-  console.error('MCP server failed to start:', error);
-  process.exit(1);
-});
+if (!process.env.VITEST) {
+  main().catch((error) => {
+    console.error('MCP server failed to start:', error);
+    process.exit(1);
+  });
+}
