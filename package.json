@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "description": "MCP server for the equalseat.ai knowledge base platform",
   "bin": {
-    "equalseat-mcp": "./build/index.cjs"
+    "equalseat-mcp": "./build/cli.cjs"
   },
   "type": "module",
-  "main": "./build/index.cjs",
+  "main": "./build/cli.cjs",
   "files": [
     "build"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
     "build": "tsup",

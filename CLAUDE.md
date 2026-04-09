@@ -22,7 +22,8 @@ npm run typecheck                 # Type check
 
 | Path              | Purpose                          |
 | ----------------- | -------------------------------- |
-| `src/index.ts`    | MCP server entry point           |
+| `src/index.ts`    | Library exports (createServer, apiRequest) |
+| `src/cli.ts`      | CLI entry point (binary)         |
 | `src/__tests__/`  | Test files                       |
 | `build/`          | Compiled output (gitignored)     |
 | `.github/`        | Dependabot, CI workflows         |
