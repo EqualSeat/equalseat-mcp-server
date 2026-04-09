@@ -165,6 +165,48 @@ describe('equalseat MCP server', () => {
       expect(text).toContain('pending');
     });
 
+    it('sends occurredAt when provided', async () => {
+      const fetchMock = mockFetch({
+        sourceId: 'src_789',
+        status: 'pending',
+      });
+      globalThis.fetch = fetchMock;
+
+      const { client } = await createTestClient();
+      await client.callTool({
+        name: 'ingest',
+        arguments: {
+          sourceName: 'Q3 Planning Meeting',
+          sourceType: 'meeting',
+          text: 'We discussed the roadmap...',
+          occurredAt: '2026-03-15T10:00:00Z',
+        },
+      });
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+      expect(body.occurredAt).toBe('2026-03-15T10:00:00Z');
+    });
+
+    it('omits occurredAt when not provided', async () => {
+      const fetchMock = mockFetch({
+        sourceId: 'src_789',
+        status: 'pending',
+      });
+      globalThis.fetch = fetchMock;
+
+      const { client } = await createTestClient();
+      await client.callTool({
+        name: 'ingest',
+        arguments: {
+          sourceName: 'Quick note',
+          text: 'Some content',
+        },
+      });
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+      expect(body).not.toHaveProperty('occurredAt');
+    });
+
     it('defaults sourceType to manual', async () => {
       const fetchMock = mockFetch({
         sourceId: 'src_456',
