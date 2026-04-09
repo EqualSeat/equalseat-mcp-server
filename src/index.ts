@@ -126,6 +126,28 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
     },
   );
 
+  server.prompt(
+    'onboard',
+    'Get oriented with the knowledge base. Discovers what the brain knows, identifies gaps, and suggests what to ingest next.',
+    () => ({
+      messages: [
+        {
+          role: 'user' as const,
+          content: {
+            type: 'text' as const,
+            text: `I've just connected to the equalseat.ai knowledge base. Help me understand what's in the brain and what's missing.
+
+1. Use the "ask" tool to ask: "What topics, domains, and types of knowledge do you currently have? Give me a high-level summary."
+2. Based on the answer, identify obvious gaps — things a typical organisation would have documented but that seem missing.
+3. Suggest 3-5 specific things I should ingest next, with example source names and types.
+
+Be concrete and actionable.`,
+          },
+        },
+      ],
+    }),
+  );
+
   return server;
 }
 

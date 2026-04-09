@@ -202,4 +202,26 @@ describe('equalseat MCP server', () => {
       expect(text).toContain('API error (500)');
     });
   });
+
+  describe('prompts', () => {
+    it('registers the onboard prompt', async () => {
+      const { client } = await createTestClient();
+      const { prompts } = await client.listPrompts();
+      const names = prompts.map((p) => p.name);
+
+      expect(names).toContain('onboard');
+      expect(names).toHaveLength(1);
+    });
+
+    it('onboard returns a message with no arguments', async () => {
+      const { client } = await createTestClient();
+      const result = await client.getPrompt({ name: 'onboard' });
+
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].role).toBe('user');
+      const content = result.messages[0].content as { type: string; text: string };
+      expect(content.text).toContain('ask');
+      expect(content.text).toContain('gaps');
+    });
+  });
 });
