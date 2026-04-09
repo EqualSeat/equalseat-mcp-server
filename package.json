@@ -6,7 +6,6 @@
     "equalseat-mcp": "./build/cli.cjs"
   },
   "type": "module",
-  "main": "./build/cli.cjs",
   "files": [
     "build"
   ],
