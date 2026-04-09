@@ -53,6 +53,22 @@ Claude will automatically discover the tools. You can:
 | `EQUALSEAT_API_KEY` | Yes | | API key from equalseat.ai settings |
 | `EQUALSEAT_API_URL` | No | `https://equalseat.ai` | API base URL (for self-hosted or local dev) |
 
+## Getting the most out of it
+
+The MCP tools work out of the box, but you'll get much better results by telling your AI assistant _when_ to use them. Add something like this to your project's `CLAUDE.md`:
+
+```markdown
+## Knowledge Base
+
+This project is connected to our equalseat.ai brain via MCP.
+
+- **Before making architectural decisions**, ask equalseat what we've already decided
+- **After meetings or discussions**, ingest key decisions and context
+- **When unsure about process**, ask equalseat before guessing
+```
+
+Tailor this to your team — the more specific you are about when to query the brain, the more your assistant will use it at the right moments.
+
 ## Examples
 
 Once configured, your AI assistant can:
