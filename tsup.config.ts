@@ -3,9 +3,9 @@ import { defineConfig } from 'tsup';
 export default defineConfig((options) => ({
   ...options,
   entry: ['src/cli.ts'],
-  format: ['cjs'],
+  format: ['esm'],
   target: 'node20',
-  outDir: 'build',
+  outDir: 'dist',
   clean: true,
   sourcemap: true,
   banner: { js: '#!/usr/bin/env node' },

@@ -25,7 +25,7 @@ npm run typecheck                 # Type check
 | `src/index.ts`    | Library exports (createServer, apiRequest) |
 | `src/cli.ts`      | CLI entry point (binary)         |
 | `src/__tests__/`  | Test files                       |
-| `build/`          | Compiled output (gitignored)     |
+| `dist/`           | Compiled output (gitignored)     |
 | `.github/`        | Dependabot, CI workflows         |
 
 ## Rules

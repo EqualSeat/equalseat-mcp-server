@@ -89,7 +89,7 @@ npm install
 npm run build
 
 # Run locally (for testing)
-EQUALSEAT_API_KEY=sk_... node build/cli.cjs
+EQUALSEAT_API_KEY=sk_... node dist/cli.js
 ```
 
 ## License
