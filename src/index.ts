@@ -92,13 +92,21 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
         .default('manual')
         .describe('Type of source content'),
       text: z.string().describe('The content to ingest'),
+      occurredAt: z
+        .string()
+        .datetime()
+        .optional()
+        .describe(
+          'When this content originated (ISO 8601). Recommended for meetings and historical content.',
+        ),
     },
-    async ({ sourceName, sourceType, text }) => {
+    async ({ sourceName, sourceType, text, occurredAt }) => {
       try {
         const result = (await apiRequest(baseUrl, apiKey, '/api/kb/ingest', {
           sourceName,
           sourceType,
           rawText: text,
+          ...(occurredAt && { occurredAt }),
         })) as {
           sourceId: string;
           status: string;
