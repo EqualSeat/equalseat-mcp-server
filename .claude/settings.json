@@ -38,6 +38,7 @@
       "Bash(gh repo:*)",
       "Bash(gh auth status:*)",
       "Bash(gh run:*)",
+      "Bash(gh release:*)",
       "Bash(gh label:*)",
 
       "Bash(npm test:*)",
