@@ -94,9 +94,10 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
       text: z.string().describe('The content to ingest'),
       occurredAt: z
         .string()
+        .datetime()
         .optional()
         .describe(
-          'When this content originated (ISO 8601). Defaults to now if omitted.',
+          'When this content originated (ISO 8601). Recommended for meetings and historical content.',
         ),
     },
     async ({ sourceName, sourceType, text, occurredAt }) => {
