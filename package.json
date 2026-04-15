@@ -1,6 +1,6 @@
 {
   "name": "@equalseat/mcp-server",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "MCP server for the equalseat.ai knowledge base platform",
   "bin": {
     "equalseat-mcp": "dist/cli.js"
