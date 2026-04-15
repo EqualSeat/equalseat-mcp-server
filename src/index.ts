@@ -80,7 +80,7 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
 
   server.tool(
     'ingest',
-    'Add content to the equalseat.ai knowledge base. The content will be processed through the extraction pipeline to identify facts, decisions, processes, and questions.',
+    'Add content to the equalseat.ai knowledge base. Content is processed through the extraction pipeline to identify facts, decisions, processes, and questions. Batch related content into a single call using markdown headings to separate sections — do not split related decisions, notes, or discussion across multiple ingest calls.',
     {
       sourceName: z
         .string()
@@ -91,13 +91,13 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
         .enum(['meeting', 'interview', 'document', 'manual'])
         .default('manual')
         .describe('Type of source content'),
-      text: z.string().describe('The content to ingest'),
+      text: z.string().describe('The content to ingest. For batched content, use markdown headings to separate logical sections.'),
       occurredAt: z
         .string()
         .datetime()
         .optional()
         .describe(
-          'When this content originated (ISO 8601). Recommended for meetings and historical content.',
+          'When this content originated, as an absolute ISO 8601 timestamp (e.g. "2026-04-15T10:00:00Z"). Resolve any relative dates ("yesterday", "last Thursday") to absolute timestamps before calling. Use the current time for freshly-authored content. For sources spanning time, use the originating event (meeting start, document authored date). Strongly recommended — downstream extraction relies on it for temporal context.',
         ),
     },
     async ({ sourceName, sourceType, text, occurredAt }) => {
