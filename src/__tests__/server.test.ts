@@ -154,7 +154,7 @@ describe('equalseat MCP server', () => {
       expect(fetchMock).toHaveBeenCalledOnce();
       const [url, options] = fetchMock.mock.calls[0];
       expect(url).toBe(`${TEST_BASE_URL}/api/kb/ingest`);
-      expect(JSON.parse(options.body)).toEqual({
+      expect(JSON.parse(options.body)).toMatchObject({
         sourceName: 'Q3 Planning Meeting',
         sourceType: 'meeting',
         rawText: 'We discussed the roadmap...',
@@ -187,13 +187,14 @@ describe('equalseat MCP server', () => {
       expect(body.occurredAt).toBe('2026-03-15T10:00:00Z');
     });
 
-    it('omits occurredAt when not provided', async () => {
+    it('defaults occurredAt to current time when not provided', async () => {
       const fetchMock = mockFetch({
         sourceId: 'src_789',
         status: 'pending',
       });
       globalThis.fetch = fetchMock;
 
+      const before = Date.now();
       const { client } = await createTestClient();
       await client.callTool({
         name: 'ingest',
@@ -202,9 +203,13 @@ describe('equalseat MCP server', () => {
           text: 'Some content',
         },
       });
+      const after = Date.now();
 
       const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-      expect(body).not.toHaveProperty('occurredAt');
+      expect(body.occurredAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+      const ts = Date.parse(body.occurredAt);
+      expect(ts).toBeGreaterThanOrEqual(before);
+      expect(ts).toBeLessThanOrEqual(after);
     });
 
     it('defaults sourceType to manual', async () => {
