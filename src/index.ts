@@ -97,7 +97,7 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
         .datetime()
         .optional()
         .describe(
-          'When this content originated, as an absolute ISO 8601 timestamp (e.g. "2026-04-15T10:00:00Z"). Resolve any relative dates ("yesterday", "last Thursday") to absolute timestamps before calling. Use the current time for freshly-authored content. For sources spanning time, use the originating event (meeting start, document authored date). Strongly recommended — downstream extraction relies on it for temporal context.',
+          'When this content originated, as an absolute ISO 8601 timestamp (e.g. "2026-04-15T10:00:00Z"). Resolve any relative dates ("yesterday", "last Thursday") to absolute timestamps before calling. For sources spanning time, use the originating event (meeting start, document authored date). Defaults to the current time if omitted — strongly recommended to set explicitly when the content is not freshly authored, since downstream extraction relies on it for temporal context.',
         ),
     },
     async ({ sourceName, sourceType, text, occurredAt }) => {
@@ -106,7 +106,7 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
           sourceName,
           sourceType,
           rawText: text,
-          ...(occurredAt && { occurredAt }),
+          occurredAt: occurredAt ?? new Date().toISOString(),
         })) as {
           sourceId: string;
           status: string;
