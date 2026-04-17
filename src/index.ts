@@ -87,10 +87,6 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
         .describe(
           'Name for this source (e.g. "Q3 Planning Meeting", "Architecture Decision")',
         ),
-      sourceType: z
-        .enum(['meeting', 'interview', 'document', 'manual'])
-        .default('manual')
-        .describe('Type of source content'),
       text: z.string().describe('The content to ingest. For batched content, use markdown headings to separate logical sections.'),
       occurredAt: z
         .string()
@@ -100,13 +96,17 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
           'When this content originated, as an absolute ISO 8601 timestamp (e.g. "2026-04-15T10:00:00Z"). Resolve any relative dates ("yesterday", "last Thursday") to absolute timestamps before calling. For sources spanning time, use the originating event (meeting start, document authored date). Defaults to the current time if omitted — strongly recommended to set explicitly when the content is not freshly authored, since downstream extraction relies on it for temporal context.',
         ),
     },
-    async ({ sourceName, sourceType, text, occurredAt }) => {
+    async ({ sourceName, text, occurredAt }) => {
       try {
+        const clientInfo = server.server.getClientVersion();
+        const entryPoint = clientInfo?.name;
+
         const result = (await apiRequest(baseUrl, apiKey, '/api/kb/ingest', {
           sourceName,
-          sourceType,
+          sourceType: 'mcp',
           rawText: text,
           occurredAt: occurredAt ?? new Date().toISOString(),
+          ...(entryPoint && { entryPoint }),
         })) as {
           sourceId: string;
           status: string;

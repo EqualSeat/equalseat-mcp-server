@@ -58,8 +58,8 @@ describe('equalseat MCP server', () => {
 
       expect(ingest).toBeDefined();
       expect(ingest!.inputSchema.properties).toHaveProperty('sourceName');
-      expect(ingest!.inputSchema.properties).toHaveProperty('sourceType');
       expect(ingest!.inputSchema.properties).toHaveProperty('text');
+      expect(ingest!.inputSchema.properties).not.toHaveProperty('sourceType');
     });
   });
 
@@ -146,7 +146,6 @@ describe('equalseat MCP server', () => {
         name: 'ingest',
         arguments: {
           sourceName: 'Q3 Planning Meeting',
-          sourceType: 'meeting',
           text: 'We discussed the roadmap...',
         },
       });
@@ -156,13 +155,53 @@ describe('equalseat MCP server', () => {
       expect(url).toBe(`${TEST_BASE_URL}/api/kb/ingest`);
       expect(JSON.parse(options.body)).toMatchObject({
         sourceName: 'Q3 Planning Meeting',
-        sourceType: 'meeting',
+        sourceType: 'mcp',
         rawText: 'We discussed the roadmap...',
       });
 
       const text = (result.content as Array<{ text: string }>)[0].text;
       expect(text).toContain('src_123');
       expect(text).toContain('pending');
+    });
+
+    it('always sends sourceType as "mcp"', async () => {
+      const fetchMock = mockFetch({
+        sourceId: 'src_456',
+        status: 'pending',
+      });
+      globalThis.fetch = fetchMock;
+
+      const { client } = await createTestClient();
+      await client.callTool({
+        name: 'ingest',
+        arguments: {
+          sourceName: 'Quick note',
+          text: 'Remember to update the docs.',
+        },
+      });
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+      expect(body.sourceType).toBe('mcp');
+    });
+
+    it('forwards the connected client name as entryPoint', async () => {
+      const fetchMock = mockFetch({
+        sourceId: 'src_ep',
+        status: 'pending',
+      });
+      globalThis.fetch = fetchMock;
+
+      const { client } = await createTestClient();
+      await client.callTool({
+        name: 'ingest',
+        arguments: {
+          sourceName: 'Session notes',
+          text: 'Notes.',
+        },
+      });
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+      expect(body.entryPoint).toBe('test-client');
     });
 
     it('sends occurredAt when provided', async () => {
@@ -177,7 +216,6 @@ describe('equalseat MCP server', () => {
         name: 'ingest',
         arguments: {
           sourceName: 'Q3 Planning Meeting',
-          sourceType: 'meeting',
           text: 'We discussed the roadmap...',
           occurredAt: '2026-03-15T10:00:00Z',
         },
@@ -210,26 +248,6 @@ describe('equalseat MCP server', () => {
       const ts = Date.parse(body.occurredAt);
       expect(ts).toBeGreaterThanOrEqual(before);
       expect(ts).toBeLessThanOrEqual(after);
-    });
-
-    it('defaults sourceType to manual', async () => {
-      const fetchMock = mockFetch({
-        sourceId: 'src_456',
-        status: 'pending',
-      });
-      globalThis.fetch = fetchMock;
-
-      const { client } = await createTestClient();
-      await client.callTool({
-        name: 'ingest',
-        arguments: {
-          sourceName: 'Quick note',
-          text: 'Remember to update the docs.',
-        },
-      });
-
-      const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-      expect(body.sourceType).toBe('manual');
     });
 
     it('returns an error when the API fails', async () => {
