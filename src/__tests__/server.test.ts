@@ -153,35 +153,16 @@ describe('equalseat MCP server', () => {
       expect(fetchMock).toHaveBeenCalledOnce();
       const [url, options] = fetchMock.mock.calls[0];
       expect(url).toBe(`${TEST_BASE_URL}/api/kb/ingest`);
-      expect(JSON.parse(options.body)).toMatchObject({
+      const sentBody = JSON.parse(options.body);
+      expect(sentBody).toMatchObject({
         sourceName: 'Q3 Planning Meeting',
-        sourceType: 'mcp',
         rawText: 'We discussed the roadmap...',
       });
+      expect(sentBody).not.toHaveProperty('sourceType');
 
       const text = (result.content as Array<{ text: string }>)[0].text;
       expect(text).toContain('src_123');
       expect(text).toContain('pending');
-    });
-
-    it('always sends sourceType as "mcp"', async () => {
-      const fetchMock = mockFetch({
-        sourceId: 'src_456',
-        status: 'pending',
-      });
-      globalThis.fetch = fetchMock;
-
-      const { client } = await createTestClient();
-      await client.callTool({
-        name: 'ingest',
-        arguments: {
-          sourceName: 'Quick note',
-          text: 'Remember to update the docs.',
-        },
-      });
-
-      const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-      expect(body.sourceType).toBe('mcp');
     });
 
     it('forwards the connected client name as entryPoint', async () => {

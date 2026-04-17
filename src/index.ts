@@ -103,7 +103,6 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
 
         const result = (await apiRequest(baseUrl, apiKey, '/api/kb/ingest', {
           sourceName,
-          sourceType: 'mcp',
           rawText: text,
           occurredAt: occurredAt ?? new Date().toISOString(),
           ...(entryPoint && { entryPoint }),
