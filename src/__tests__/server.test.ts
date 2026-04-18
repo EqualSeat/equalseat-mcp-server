@@ -2,8 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from '../index.js';
-import pkg from '../../package.json' with { type: 'json' };
+import { createRequire } from 'node:module';
 
+const pkg = createRequire(import.meta.url)('../../package.json') as {
+  version: string;
+};
 const packageVersion = pkg.version;
 
 const TEST_API_KEY = 'sk_test_key';

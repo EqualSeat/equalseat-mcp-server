@@ -1,7 +1,10 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import pkg from '../package.json' with { type: 'json' };
+import { createRequire } from 'node:module';
 
+const pkg = createRequire(import.meta.url)('../package.json') as {
+  version: string;
+};
 const packageVersion = pkg.version;
 
 export async function apiRequest(
