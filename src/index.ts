@@ -1,5 +1,11 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { createRequire } from 'node:module';
+
+const pkg = createRequire(import.meta.url)('../package.json') as {
+  version: string;
+};
+const packageVersion = pkg.version;
 
 export async function apiRequest(
   baseUrl: string,
@@ -27,7 +33,7 @@ export async function apiRequest(
 export function createServer(apiKey: string, baseUrl: string): McpServer {
   const server = new McpServer({
     name: 'equalseat',
-    version: '0.1.0',
+    version: packageVersion,
   });
 
   server.tool(
@@ -131,6 +137,20 @@ export function createServer(apiKey: string, baseUrl: string): McpServer {
         };
       }
     },
+  );
+
+  server.tool(
+    'version',
+    'Return the version of the equalseat MCP server. Useful for debugging and verifying which build is connected.',
+    {},
+    async () => ({
+      content: [
+        {
+          type: 'text' as const,
+          text: packageVersion,
+        },
+      ],
+    }),
   );
 
   server.prompt(

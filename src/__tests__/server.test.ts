@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from '../index.js';
+import { createRequire } from 'node:module';
+
+const pkg = createRequire(import.meta.url)('../../package.json') as {
+  version: string;
+};
+const packageVersion = pkg.version;
 
 const TEST_API_KEY = 'sk_test_key';
 const TEST_BASE_URL = 'https://test.equalseat.ai';
@@ -60,6 +66,27 @@ describe('equalseat MCP server', () => {
       expect(ingest!.inputSchema.properties).toHaveProperty('sourceName');
       expect(ingest!.inputSchema.properties).toHaveProperty('text');
       expect(ingest!.inputSchema.properties).not.toHaveProperty('sourceType');
+    });
+
+    it('registers the version tool', async () => {
+      const { client } = await createTestClient();
+      const { tools } = await client.listTools();
+      const version = tools.find((t) => t.name === 'version');
+
+      expect(version).toBeDefined();
+    });
+  });
+
+  describe('version tool', () => {
+    it('returns the package version', async () => {
+      const { client } = await createTestClient();
+      const result = await client.callTool({
+        name: 'version',
+        arguments: {},
+      });
+
+      const text = (result.content as Array<{ text: string }>)[0].text;
+      expect(text).toBe(packageVersion);
     });
   });
 
